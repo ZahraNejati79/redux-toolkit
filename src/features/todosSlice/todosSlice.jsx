@@ -13,6 +13,36 @@ export const getAsyncTodos = createAsyncThunk(
   }
 );
 
+export const addAsyncTodos = createAsyncThunk(
+  "todos/addAsyncTodos",
+  async (payload, { rejectWithValue }) => {
+    try {
+      const response = await axios.post("http://localhost:3001/todos", {
+        id: Date.now(),
+        title: payload.title,
+        completed: false,
+      });
+      return response.data;
+    } catch (error) {
+      rejectWithValue(error);
+    }
+  }
+);
+
+export const toggleAsyncTodos = createAsyncThunk(
+  "todos/toggleAsyncTodos",
+  async (payload, rejectWithValue) => {
+    try {
+      const res = await axios.put(`http://localhost:3001/todos/${payload.id}`, {
+        completed: payload.completed,
+      });
+      return res.data;
+    } catch (error) {
+      rejectWithValue(error);
+    }
+  }
+);
+
 const initialState = {
   todos: [],
   loading: false,
@@ -57,6 +87,13 @@ const todosSlice = createSlice({
         loading: false,
         error: action.error.massage,
       };
+    },
+    [addAsyncTodos.fulfilled]: (state, action) => {
+      state.todos.push(action.payload);
+    },
+    [toggleAsyncTodos.fulfilled]: (state, action) => {
+      const selectedTodo = state.todos.find((t) => t.id === action.payload.id);
+      selectedTodo.completed = !action.payload.completed;
     },
   },
 });
