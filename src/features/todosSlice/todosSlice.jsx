@@ -35,8 +35,21 @@ export const toggleAsyncTodos = createAsyncThunk(
     try {
       const res = await axios.put(`http://localhost:3001/todos/${payload.id}`, {
         completed: payload.completed,
+        title: payload.title,
       });
       return res.data;
+    } catch (error) {
+      return rejectWithValue([], error);
+    }
+  }
+);
+
+export const deleteAsyncTodos = createAsyncThunk(
+  "todos/deleteAsyncTodos",
+  async (payload, { rejectWithValue }) => {
+    try {
+      await axios.delete(`http://localhost:3001/todos/${payload.id}`);
+      return { id: payload.id };
     } catch (error) {
       rejectWithValue(error);
     }
@@ -93,7 +106,10 @@ const todosSlice = createSlice({
     },
     [toggleAsyncTodos.fulfilled]: (state, action) => {
       const selectedTodo = state.todos.find((t) => t.id === action.payload.id);
-      selectedTodo.completed = !action.payload.completed;
+      selectedTodo.completed = action.payload.completed;
+    },
+    [deleteAsyncTodos.fulfilled]: (state, action) => {
+      state.todos = state.todos.filter((t) => t.id !== action.payload.id);
     },
   },
 });
