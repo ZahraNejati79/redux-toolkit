@@ -16,7 +16,8 @@ const TodoList = () => {
       <h2>TodoList</h2>
       {loading && <p>loading</p>}
 
-      {error && <p>{error}</p>}
+      {error && <p> {error} </p>}
+
       <ul className="list-group">
         {todos.map((todo) => (
           <TodoItem key={todo.id} {...todo} />
